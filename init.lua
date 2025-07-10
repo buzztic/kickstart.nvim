@@ -61,7 +61,7 @@ else
   vim.o.updatetime = 250
 
   -- Decrease mapped sequence wait time
-  vim.o.timeoutlen = 300
+  vim.o.timeoutlen = 2000
 
   -- Configure how new splits should be opened
   vim.o.splitright = true
@@ -138,7 +138,13 @@ else
       vim.hl.on_yank()
     end,
   })
-
+  vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+    pattern = '*.hive',
+    callback = function()
+      vim.bo.filetype = 'sql'
+    end,
+    desc = 'Set filetype to SQL for Hive files',
+  })
   -- [[ Install `lazy.nvim` plugin manager ]]
   --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
   local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -557,14 +563,23 @@ else
         formatters_by_ft = {
           lua = { 'stylua' },
           -- Conform can also run multiple formatters sequentially
-          -- python = { "isort", "black" },
+          python = { 'black' },
+          sql = { 'pgformatter' },
           --
           -- You can use 'stop_after_first' to run the first available formatter from the list
           -- javascript = { "prettierd", "prettier", stop_after_first = true },
         },
       },
     },
-
+    {
+      'saghen/blink.compat',
+      -- use v2.* for blink.cmp v1.*
+      version = '2.*',
+      -- lazy.nvim will automatically load the plugin when it's required by blink.cmp
+      lazy = true,
+      -- make sure to set opts so that lazy.nvim calls blink.compat's setup
+      opts = {},
+    },
     { -- Autocompletion
       'saghen/blink.cmp',
       event = 'VimEnter',
@@ -614,9 +629,14 @@ else
         },
 
         sources = {
-          default = { 'lsp', 'path', 'snippets', 'lazydev' },
+          default = { 'lsp', 'path', 'snippets', 'lazydev', 'buffer' },
+          per_filetype = {
+            -- Dbee
+            sql = { 'dbee', 'buffer' }, -- Add any other source to include here
+          },
           providers = {
             lazydev = { module = 'lazydev.integrations.blink', score_offset = 100 },
+            dbee = { name = 'cmp-dbee', module = 'blink.compat.source' },
           },
         },
 
@@ -766,6 +786,49 @@ else
         vim.keymap.set('n', '<space>rh', '<cmd>IronHide<cr>')
       end,
     },
+    {
+      -- Run SQL inside nvim :)
+      'kndndrj/nvim-dbee',
+      dependencies = {
+        'MunifTanjim/nui.nvim',
+      },
+      build = function()
+        require('dbee').install()
+      end,
+      config = function()
+        require('dbee').setup(--[[optional config]])
+      end,
+    },
+    {
+      'hrsh7th/nvim-cmp',
+      dependencies = {
+        {
+          'MattiasMTS/cmp-dbee',
+          dependencies = {
+            { 'kndndrj/nvim-dbee' },
+          },
+          ft = 'sql', -- optional but good to have
+          opts = {}, -- needed
+        },
+      },
+      opts = {
+        sources = {
+          { 'cmp-dbee' },
+        },
+      },
+    },
+    --  Plugin pour naviguer dans les fichiers
+    -- {
+    --   'nvim-tree/nvim-tree.lua',
+    --   version = '*',
+    --   lazy = false,
+    --   dependencies = {
+    --     'nvim-tree/nvim-web-devicons',
+    --   },
+    --   config = function()
+    --     require('nvim-tree').setup {}
+    --   end,
+    -- },
   }, {
     ui = {
       -- If you are using a Nerd Font: set icons to an empty table which will use the
