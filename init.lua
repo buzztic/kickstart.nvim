@@ -298,6 +298,7 @@ else
         vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
         vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
+        vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<CR>', { desc = 'Toggle NvimTree' })
         -- Slightly advanced example of overriding default behavior and theme
         vim.keymap.set('n', '<leader>/', function()
           -- You can pass additional configuration to Telescope to change the theme, layout, etc.
@@ -564,7 +565,7 @@ else
           lua = { 'stylua' },
           -- Conform can also run multiple formatters sequentially
           python = { 'black' },
-          sql = { 'pgformatter' },
+          sql = { 'sql_formatter' },
           --
           -- You can use 'stop_after_first' to run the first available formatter from the list
           -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -817,18 +818,18 @@ else
         },
       },
     },
-    --  Plugin pour naviguer dans les fichiers
-    -- {
-    --   'nvim-tree/nvim-tree.lua',
-    --   version = '*',
-    --   lazy = false,
-    --   dependencies = {
-    --     'nvim-tree/nvim-web-devicons',
-    --   },
-    --   config = function()
-    --     require('nvim-tree').setup {}
-    --   end,
-    -- },
+    -- Plugin pour naviguer dans les fichiers
+    {
+      'nvim-tree/nvim-tree.lua',
+      version = '*',
+      lazy = false,
+      dependencies = {
+        'nvim-tree/nvim-web-devicons',
+      },
+      config = function()
+        require('nvim-tree').setup {}
+      end,
+    },
   }, {
     ui = {
       -- If you are using a Nerd Font: set icons to an empty table which will use the
