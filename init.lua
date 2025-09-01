@@ -563,9 +563,9 @@ else
         end,
         formatters_by_ft = {
           lua = { 'stylua' },
-          -- Conform can also run multiple formatters sequentially
           python = { 'black' },
           sql = { 'sql_formatter' },
+          yaml = { 'yamlfmt' },
           --
           -- You can use 'stop_after_first' to run the first available formatter from the list
           -- javascript = { "prettierd", "prettier", stop_after_first = true },
@@ -830,6 +830,7 @@ else
         require('nvim-tree').setup {}
       end,
     },
+    { 'akinsho/git-conflict.nvim', version = '*', config = true },
   }, {
     ui = {
       -- If you are using a Nerd Font: set icons to an empty table which will use the
